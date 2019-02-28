@@ -1,6 +1,10 @@
 #include<iostream> 
 using namespace std; 
 
+class Object 
+{
+
+};
 class Profile 
 {
     public:
@@ -64,7 +68,7 @@ class RegisteredSubscriber:public Subscriber
         bool loggedin;
 };
 
-class Adapter 
+class Adapter :public Object
 {
     public:
         virtual void insert(RegisteredSubscriber subscriber) = 0;
@@ -126,7 +130,7 @@ class ArrayAdapter : public Adapter
         }
 };
 
-class Security
+class Security :public Object
 {
     public: 
         virtual Profile login(Credentials credentials) = 0;
@@ -141,7 +145,7 @@ class SimpleSecurity : public Security
         static SimpleSecurity* instance;
         SimpleSecurity()
         {
-            adapter = new ArrayAdapter();
+            adapter = (Adapter*) ObjectFactory::getObject("adapter");
         }
     public: 
         static SimpleSecurity* getInstance()
@@ -194,20 +198,22 @@ class SimpleSecurity : public Security
 
 SimpleSecurity *SimpleSecurity::instance = 0;
 
-class SecurityFactory 
+class ObjectFactory 
 {
     public:
-        static Security* getSecurity()
+        static Object* getObject(string key)
         {
-            return SimpleSecurity::getInstance();
+            if(key == "adapter")
+                return new ArrayAdapter();
+            else if(key == "security")
+                return SimpleSecurity::getInstance();
+            throw "not found";
         }
 };
 
-
-
 int main()
 {
-    Security* security = SecurityFactory::getSecurity();
+    Security* security = (Security*) ObjectFactory::getObject("security");
     Profile profile = Profile("Krishna Mohan Koyya", "krishna@glarimy.com");
     Credentials credentials = Credentials("koyya", "123456");
     Subscriber subsriber = Subscriber(credentials, profile);
