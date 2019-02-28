@@ -5,6 +5,12 @@ class Object
 {
 
 };
+
+class ObjectFactory{
+    public:
+    static Object* getObject(string key);
+};
+
 class Profile 
 {
     public:
@@ -198,21 +204,18 @@ class SimpleSecurity : public Security
 
 SimpleSecurity *SimpleSecurity::instance = 0;
 
-class ObjectFactory 
+Object* ObjectFactory::getObject(string key)
 {
-    public:
-        static Object* getObject(string key)
-        {
-            if(key == "adapter")
-                return new ArrayAdapter();
-            else if(key == "security")
-                return SimpleSecurity::getInstance();
-            throw "not found";
-        }
+    if(key == "adapter")
+        return new ArrayAdapter();
+    else if(key == "security")
+        return SimpleSecurity::getInstance();
+    throw "not found";
 };
 
 int main()
 {
+    cout << "Illustrating adapter" << endl;
     Security* security = (Security*) ObjectFactory::getObject("security");
     Profile profile = Profile("Krishna Mohan Koyya", "krishna@glarimy.com");
     Credentials credentials = Credentials("koyya", "123456");
